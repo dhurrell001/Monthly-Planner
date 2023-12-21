@@ -1,4 +1,5 @@
 import tkinter as tk
+from MonthCalenderV2 import SendCalendarDayToGUI
 
 
 def create_entry(parent, row, column):

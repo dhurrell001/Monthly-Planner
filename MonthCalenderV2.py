@@ -41,10 +41,6 @@ def PreviousMonth(selected_date, AmountOfPreviouMonths):
     return days_in_month
 
 
-def NextMonth():
-    pass
-
-
 def CreateCalendarMatrix():
     # set a list for 42 days ( 7 days time 6 weeks)
     calender_day_slots = [0 for x in range(0, 42)]
@@ -52,7 +48,7 @@ def CreateCalendarMatrix():
     return calender_day_slots
 
 
-def FillMatrixCurrentMonth(calenderDisplay, dayOfMonthInteger, days_in_current_month):
+def FillMatrixCurrentMonth(dayOfMonthInteger, days_in_current_month, calenderDays):
     # Start to fill the calender from the first day of the month.
     # using day datetime integer as a start index 0-Monday 1- Tuesday etc
     # Get the number of days in the current month
@@ -61,12 +57,13 @@ def FillMatrixCurrentMonth(calenderDisplay, dayOfMonthInteger, days_in_current_m
 
     for thisMonth in range(dayOfMonthInteger, days_in_current_month + dayOfMonthInteger):
 
-        calenderDisplay[thisMonth] = beginning_new_month_output
+       # calenderDisplay[thisMonth] = beginning_new_month_output
+        calenderDays.append(beginning_new_month_output)
         beginning_new_month_output += 1
     return calenderDisplay
 
 
-def FillMatrixPreviousMonth(calenderDisplay, currentDayAsInteger, selected_date, AmountOfPreviouMonths):
+def FillMatrixPreviousMonth(currentDayAsInteger, selected_date, AmountOfPreviouMonths, calenderDays):
     # fill the calender days before the current month start date with
     # last days of previous month.i.e (28 29 30) 1 2 3
     previousMonthNumberOfDays = PreviousMonth(
@@ -75,27 +72,49 @@ def FillMatrixPreviousMonth(calenderDisplay, currentDayAsInteger, selected_date,
 # Start to fill calender matrix with previous months days if thi month doe not start on a Monday
     for day in range(0, currentDayAsInteger):
 
-        calenderDisplay[day] = last_month_day_start
+        # [day] = last_month_day_start
+        calenderDays.append(last_month_day_start)
         last_month_day_start += 1
     return calenderDisplay
 
 
-def FillMatrixNextMonth(calenderDisplay, dayOfMonthInteger, selected_date):
+def FillMatrixNextMonth(dayOfMonthInteger, selected_date, calenderDays):
     # fill matrix after current month end date with first days
     # of the next month i.e 28 29 30 (1 2 3)
     beginning_next_month_output = 1
     days_in_current_month = calendar.monthrange(
         selected_date.year, selected_date.month)[1]
     # fill any remaining slot in matrix with next months day starting at one.
-    for nextMonth in range(days_in_current_month+dayOfMonthInteger, 42):
-        calenderDisplay[nextMonth] = beginning_next_month_output
+    for day in range(days_in_current_month+dayOfMonthInteger, 42):
+        # calendrDisplay[nextMonth] = beginning_next_month_output
+        calenderDays.append(beginning_next_month_output)
         beginning_next_month_output += 1
 
 
+def SendCalendarDayToGUI():
+    calenderDays = []
+
+    FillMatrixPreviousMonth(
+        currentDayAsInteger, selectedMonth, 1, calenderDays)
+
+    FillMatrixCurrentMonth(
+        currentDayAsInteger, days_in_selected_month, calenderDays)
+    # FillMatrixCurrentMonth(
+    #     calenderDisplay, currentDayAsInteger, days_in_selected_month,calenderDays)
+
+    FillMatrixNextMonth(currentDayAsInteger,
+                        selectedMonth, calenderDays)
+    return calenderDays
+
+
+def SendSelectedDateToGUI():
+    return selectedMonth
+
+
 # currentDayAsInteger = CurrentMonth()
-# create a datetime objct for the date i want a the current month. The previous and next month
+# create a datetime objct for the date i want to be the current month. The previous and next month
 # will be realtive to this
-selectedMonth = current_datetime  # datetime(2024, 9, 1)
+selectedMonth = datetime(2024, 1, 1)
 # Get the number of days in the selected month
 days_in_selected_month = calendar.monthrange(
     selectedMonth.year, selectedMonth.month)[1]
@@ -104,13 +123,22 @@ days_in_selected_month = calendar.monthrange(
 # if it was thursday it would return a 3 so it would start at index 3
 currentDayAsInteger = get_first_day_of_selected_month(selectedMonth)
 calenderDisplay = CreateCalendarMatrix()
-FillMatrixCurrentMonth(
-    calenderDisplay, currentDayAsInteger, days_in_selected_month)
+calenderDays = []
 
-FillMatrixNextMonth(calenderDisplay, currentDayAsInteger, selectedMonth)
+# FillMatrixPreviousMonth(
+#     calenderDisplay, currentDayAsInteger, selectedMonth, 1, calenderDays)
 
-FillMatrixPreviousMonth(calenderDisplay, currentDayAsInteger, selectedMonth, 1)
+# FillMatrixCurrentMonth(
+#     calenderDisplay, currentDayAsInteger, days_in_selected_month, calenderDays)
+# # FillMatrixCurrentMonth(
+# #     calenderDisplay, currentDayAsInteger, days_in_selected_month,calenderDays)
 
-days_matrix = np.array(calenderDisplay).reshape(6, 7)
-print(f"Day : {current_datetime.day} Month : {current_datetime.month} Year : {current_datetime.year}\n")
-print(days_matrix)
+# FillMatrixNextMonth(calenderDisplay, currentDayAsInteger,
+#                     selectedMonth, calenderDays)
+
+# # FillMatrixPreviousMonth(calenderDisplay, currentDayAsInteger, selectedMonth, 1,calenderDays)
+
+# days_matrix = np.array(calenderDisplay).reshape(6, 7)
+# print(f"Day : {current_datetime.day} Month : {current_datetime.month} Year : {current_datetime.year}\n")
+# print(days_matrix)
+# print(calenderDays)
